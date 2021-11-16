@@ -3,21 +3,19 @@
 cmake_minimum_required(VERSION 3.19)
 
 # Project name and a few useful settings. Other commands can pick up the results
-project(template
+project(http_request
         VERSION 0.1
         DESCRIPTION ""
         LANGUAGES C)
 
 set(HEADER_LIST
-        "${template_SOURCE_DIR}/include/common.h"
         )
 
 set(COMMON_SOURCE_LIST
-        "${template_SOURCE_DIR}/src/common.c"
         )
 
 set(MAIN_SOURCE
-        "${template_SOURCE_DIR}/src/main.c"
+        "${http_request_SOURCE_DIR}/src/main.c"
         )
 
 ### Require out-of-source builds
