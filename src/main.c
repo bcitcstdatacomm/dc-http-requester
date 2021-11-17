@@ -5,6 +5,7 @@
 #include <dc_posix/dc_stdlib.h>
 #include <dc_posix/dc_string.h>
 #include <dc_posix/dc_unistd.h>
+#include <dc_posix/dc_time.h>
 #include <dc_posix/sys/dc_socket.h>
 #include <assert.h>
 #include <getopt.h>
@@ -76,8 +77,8 @@ static struct dc_application_settings *create_settings(const struct dc_posix_env
     static const uint16_t default_port = 80;
     static const uint16_t default_min_chars = 1;
     static const uint16_t default_max_chars = 1;
-    static const uint16_t default_min_delay = 1000;
-    static const uint16_t default_max_delay = 1000;
+    static const uint16_t default_min_delay = 2500;
+    static const uint16_t default_max_delay = 2500;
     static const char *default_request_string = NULL;
 
     DC_TRACE(env);
@@ -295,6 +296,7 @@ static void send_request(const struct dc_posix_env *env,
 {
     size_t length;
     char *full_request;
+    struct timespec sleep_info;
 
     // + 4 for the trailing \r\n\r\n
     length = dc_strlen(env, request) + 4;
@@ -305,8 +307,10 @@ static void send_request(const struct dc_posix_env *env,
     for(size_t i = 0; i < length;)
     {
         size_t next;
+        long delay;
 
         next = min_chars;
+        delay = min_delay;
 
         if(i + next > length)
         {
@@ -314,6 +318,12 @@ static void send_request(const struct dc_posix_env *env,
         }
 
         dc_write(env, err, socket_fd, &full_request[i], next);
+        dc_write(env, err, STDOUT_FILENO, "SENT: ", 6);
+        dc_write(env, err, STDOUT_FILENO, &full_request[i], next);
+        dc_write(env, err, STDOUT_FILENO, "\n", 1);
+        sleep_info.tv_sec = 0L;
+        sleep_info.tv_nsec = delay * 100000L;
+        dc_nanosleep(env, err, &sleep_info, NULL);
         i += next;
     }
 
