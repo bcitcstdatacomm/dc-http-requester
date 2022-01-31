@@ -335,5 +335,9 @@ static void send_request(const struct dc_posix_env *env,
     ssize_t nread;
 
     nread = dc_read(env, err, socket_fd, buffer, 2048);
-    dc_write(env, err, STDOUT_FILENO, buffer, nread);
+
+    if(dc_error_has_no_error(err))
+    {
+        dc_write(env, err, STDOUT_FILENO, buffer, (size_t)nread);
+    }
 }
