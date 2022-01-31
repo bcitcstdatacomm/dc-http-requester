@@ -4,6 +4,10 @@ if(APPLE)
     add_definitions(-D_DARWIN_C_SOURCE)
 endif()
 
+if(UNIX)
+    add_definitions(-D__BSD_VISIBLE)
+endif()
+
 find_program(LINT "clang-tidy")
 IF (LINT)
     set(CMAKE_C_CLANG_TIDY "clang-tidy;-checks=*,-llvmlibc-restrict-system-libc-headers,-cppcoreguidelines-init-variables,-clang-analyzer-security.insecureAPI.strcpy,-concurrency-mt-unsafe,-android-cloexec-accept,-android-cloexec-dup,-google-readability-todo,-cppcoreguidelines-avoid-magic-numbers,-readability-magic-numbers,-cert-dcl03-c,-hicpp-static-assert,-misc-static-assert,-altera-struct-pack-align,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling;--quiet")
