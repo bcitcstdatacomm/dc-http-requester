@@ -9,6 +9,7 @@
 #include <dc_posix/sys/dc_socket.h>
 #include <assert.h>
 #include <getopt.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
