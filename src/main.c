@@ -1,18 +1,18 @@
+#include <assert.h>
 #include <dc_application/command_line.h>
 #include <dc_application/config.h>
 #include <dc_application/options.h>
 #include <dc_posix/dc_netdb.h>
 #include <dc_posix/dc_stdlib.h>
 #include <dc_posix/dc_string.h>
-#include <dc_posix/dc_unistd.h>
 #include <dc_posix/dc_time.h>
+#include <dc_posix/dc_unistd.h>
 #include <dc_posix/sys/dc_socket.h>
-#include <assert.h>
 #include <getopt.h>
 #include <netinet/in.h>
-#include <sys/socket.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 
@@ -41,32 +41,30 @@ static int connect_to_server(const struct dc_posix_env *env,
                       const char *hostname,
                       uint16_t port);
 static void send_request(const struct dc_posix_env *env,
-                 struct dc_error *err,
-                 int socket_fd,
-                 const char *message,
-                 uint16_t min_chars,
-                 uint16_t max_chars,
-                 uint16_t min_delay,
-                 uint16_t max_delay);
+                         struct dc_error *err,
+                         int socket_fd,
+                         const char *request,
+                         uint16_t min_chars,
+                         uint16_t max_chars,
+                         uint16_t min_delay,
+                         uint16_t max_delay);
 
 int main(int argc, char *argv[])
 {
-    dc_error_reporter reporter;
     dc_posix_tracer tracer;
-    struct dc_posix_env env;
-    struct dc_error err;
+    struct dc_posix_env *env;
+    struct dc_error *err;
     struct dc_application_info *info;
     int ret_val;
 
-    reporter = dc_error_default_error_reporter;
     tracer = dc_posix_default_tracer;
     tracer = NULL;
-    dc_error_init(&err, reporter);
-    dc_posix_env_init(&env, tracer);
-    info = dc_application_info_create(&env, &err, "Settings Application");
-    ret_val = dc_application_run(&env, &err, info, create_settings, destroy_settings, run, dc_default_create_lifecycle, dc_default_destroy_lifecycle, NULL, argc, argv);
-    dc_application_info_destroy(&env, &info);
-    dc_error_reset(&err);
+    err = dc_error_create(true);
+    env = dc_posix_env_create(err, true, tracer);
+    info = dc_application_info_create(env, err, "Settings Application");
+    ret_val = dc_application_run(env, err, info, create_settings, destroy_settings, run, dc_default_create_lifecycle, dc_default_destroy_lifecycle, NULL, argc, argv);
+    dc_application_info_destroy(env, &info);
+    dc_error_reset(err);
 
     return ret_val;
 }
@@ -145,11 +143,7 @@ static int destroy_settings(const struct dc_posix_env *env,
     dc_setting_string_destroy(env, &app_settings->request_string);
     dc_free(env, app_settings->opts.opts, app_settings->opts.opts_count);
     dc_free(env, *psettings, sizeof(struct application_settings));
-
-    if(env->null_free)
-    {
-        *psettings = NULL;
-    }
+    *psettings = NULL;
 
     return 0;
 }
