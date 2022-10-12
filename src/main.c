@@ -282,6 +282,8 @@ static int connect_to_server(const struct dc_posix_env *env,
     return sock_fd;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 static void send_request(const struct dc_posix_env *env,
                          struct dc_error *err,
                          int socket_fd,
@@ -335,3 +337,5 @@ static void send_request(const struct dc_posix_env *env,
         dc_write(env, err, STDOUT_FILENO, buffer, (size_t)nread);
     }
 }
+#pragma GCC diagnostic pop
+
