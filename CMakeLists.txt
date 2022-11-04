@@ -160,6 +160,8 @@ set_target_properties(dc-http-requester PROPERTIES
         SOVERSION ${PROJECT_VERSION_MAJOR})
 
 find_library(LIBDC_ERROR dc_error REQUIRED)
+find_library(LIBDC_ENV dc_env REQUIRED)
+find_library(LIBDC_C dc_c REQUIRED)
 find_library(LIBDC_POSIX dc_posix REQUIRED)
 find_library(LIBDC_UTIL dc_util REQUIRED)
 find_library(LIBDC_FSM dc_fsm REQUIRED)
@@ -167,6 +169,8 @@ find_library(LIB_CONFIG config REQUIRED)
 find_library(LIBDC_APPLICATION dc_application REQUIRED)
 
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_ERROR})
+target_link_libraries(dc-http-requester PUBLIC ${LIBDC_ENV})
+target_link_libraries(dc-http-requester PUBLIC ${LIBDC_C})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_POSIX})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_UTIL})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_FSM})

@@ -2,9 +2,9 @@
 #include <dc_application/command_line.h>
 #include <dc_application/config.h>
 #include <dc_application/options.h>
+#include <dc_c/dc_stdlib.h>
+#include <dc_c/dc_string.h>
 #include <dc_posix/dc_netdb.h>
-#include <dc_posix/dc_stdlib.h>
-#include <dc_posix/dc_string.h>
 #include <dc_posix/dc_time.h>
 #include <dc_posix/dc_unistd.h>
 #include <dc_posix/sys/dc_socket.h>
@@ -30,17 +30,17 @@ struct application_settings
     struct dc_setting_string *request_string;
 };
 
-static struct dc_application_settings *create_settings(const struct dc_posix_env *env, struct dc_error *err);
-static int destroy_settings(const struct dc_posix_env *env,
+static struct dc_application_settings *create_settings(const struct dc_env *env, struct dc_error *err);
+static int destroy_settings(const struct dc_env *env,
                             struct dc_error *err,
                             struct dc_application_settings **psettings);
-static int run(const struct dc_posix_env *env, struct dc_error *err, struct dc_application_settings *settings);
-static int connect_to_server(const struct dc_posix_env *env,
+static int run(const struct dc_env *env, struct dc_error *err, struct dc_application_settings *settings);
+static int connect_to_server(const struct dc_env *env,
                       struct dc_error *err,
                       const char *ip_version,
                       const char *hostname,
                       uint16_t port);
-static void send_request(const struct dc_posix_env *env,
+static void send_request(const struct dc_env *env,
                          struct dc_error *err,
                          int socket_fd,
                          const char *request,
@@ -51,16 +51,13 @@ static void send_request(const struct dc_posix_env *env,
 
 int main(int argc, char *argv[])
 {
-    dc_posix_tracer tracer;
-    struct dc_posix_env *env;
+    struct dc_env *env;
     struct dc_error *err;
     struct dc_application_info *info;
     int ret_val;
 
-    tracer = dc_posix_default_tracer;
-    tracer = NULL;
     err = dc_error_create(true);
-    env = dc_posix_env_create(err, true, tracer);
+    env = dc_env_create(err, true, dc_env_default_tracer);
     info = dc_application_info_create(env, err, "Settings Application");
     ret_val = dc_application_run(env, err, info, create_settings, destroy_settings, run, dc_default_create_lifecycle, dc_default_destroy_lifecycle, NULL, argc, argv);
     dc_application_info_destroy(env, &info);
@@ -69,7 +66,7 @@ int main(int argc, char *argv[])
     return ret_val;
 }
 
-static struct dc_application_settings *create_settings(const struct dc_posix_env *env, struct dc_error *err)
+static struct dc_application_settings *create_settings(const struct dc_env *env, struct dc_error *err)
 {
     struct application_settings *settings;
     static const bool default_verbose = false;
@@ -132,7 +129,7 @@ static struct dc_application_settings *create_settings(const struct dc_posix_env
     return (struct dc_application_settings *)settings;
 }
 
-static int destroy_settings(const struct dc_posix_env *env,
+static int destroy_settings(const struct dc_env *env,
                             __attribute__((unused)) struct dc_error *err,
                             struct dc_application_settings **psettings)
 {
@@ -141,14 +138,14 @@ static int destroy_settings(const struct dc_posix_env *env,
     DC_TRACE(env);
     app_settings = (struct application_settings *)*psettings;
     dc_setting_string_destroy(env, &app_settings->request_string);
-    dc_free(env, app_settings->opts.opts, app_settings->opts.opts_count);
-    dc_free(env, *psettings, sizeof(struct application_settings));
+    dc_free(env, app_settings->opts.opts);
+    dc_free(env, *psettings);
     *psettings = NULL;
 
     return 0;
 }
 
-static int run(const struct dc_posix_env *env, struct dc_error *err, struct dc_application_settings *settings)
+static int run(const struct dc_env *env, struct dc_error *err, struct dc_application_settings *settings)
 {
     struct application_settings *app_settings;
     const char *request_string;
@@ -196,7 +193,7 @@ static int run(const struct dc_posix_env *env, struct dc_error *err, struct dc_a
     return EXIT_SUCCESS;
 }
 
-static int connect_to_server(const struct dc_posix_env *env,
+static int connect_to_server(const struct dc_env *env,
                              struct dc_error *err,
                              const char *ip_version,
                              const char *hostname,
@@ -284,7 +281,7 @@ static int connect_to_server(const struct dc_posix_env *env,
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-static void send_request(const struct dc_posix_env *env,
+static void send_request(const struct dc_env *env,
                          struct dc_error *err,
                          int socket_fd,
                          const char *request,
