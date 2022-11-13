@@ -212,5 +212,5 @@ install(TARGETS dc-http-requester DESTINATION bin)
 
 add_dependencies(dc-http-requester doxygen)
 
-find_library(LIBCGREEN cgreen REQUIRED)
-add_subdirectory(tests)
+#find_library(LIBCGREEN cgreen REQUIRED)
+#add_subdirectory(tests)
