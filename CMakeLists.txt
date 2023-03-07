@@ -201,6 +201,7 @@ find_library(LIBDC_UTIL dc_util REQUIRED)
 find_library(LIBDC_FSM dc_fsm REQUIRED)
 find_library(LIB_CONFIG config REQUIRED)
 find_library(LIBDC_APPLICATION dc_application REQUIRED)
+find_library(LIBBSD bsd)
 
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_ERROR})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_ENV})
@@ -210,6 +211,10 @@ target_link_libraries(dc-http-requester PUBLIC ${LIBDC_UTIL})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_FSM})
 target_link_libraries(dc-http-requester PUBLIC ${LIB_CONFIG})
 target_link_libraries(dc-http-requester PUBLIC ${LIBDC_APPLICATION})
+
+if(LIBBSD)
+    target_link_libraries(dc-http-requester PUBLIC ${LIBBSD})
+endif()
 
 set_target_properties(dc-http-requester PROPERTIES OUTPUT_NAME "dchttprequester")
 install(TARGETS dc-http-requester DESTINATION bin)
